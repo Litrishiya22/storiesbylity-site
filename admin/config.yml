@@ -32,3 +32,16 @@ collections:
                 name: "pages"
                 widget: "list"
                 hint: "Each item is one page shown in the reader. Click 'Add' to add another page."
+
+  - name: "site"
+    label: "Site content"
+    files:
+      - file: "content/site.json"
+        label: "About & contact"
+        name: "site"
+        fields:
+          - {label: "About heading", name: "aboutTitle", widget: "string"}
+          - {label: "About paragraph 1", name: "aboutP1", widget: "text"}
+          - {label: "About paragraph 2", name: "aboutP2", widget: "text"}
+          - {label: "Contact email", name: "contactEmail", widget: "string"}
+              
