@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Storiesbylity — content manager</title>
+</head>
+<body>
+  <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+  <script>
+    var storiesPreviewStyle = {
+      fontFamily: "'Fraunces', Georgia, serif",
+      background: "#FBF3E7",
+      color: "#232946",
+      padding: "28px"
+    };
+
+    var StoriesPreview = createClass({
+      render: function () {
+        var entry = this.props.entry;
+        var storiesList = entry.getIn(['data', 'stories']);
+        var list = storiesList ? storiesList.toJS() : [];
+        var getAsset = this.props.getAsset;
+
+        return h('div', { style: storiesPreviewStyle },
+          h('h1', { style: { fontSize: '26px', marginBottom: '20px' } }, 'Story shelf preview'),
+          list.map(function (s, i) {
+            var coverUrl = null;
+            if (s.cover && getAsset) {
+              var asset = getAsset(s.cover);
+              coverUrl = asset ? asset.toString() : null;
+            }
+            return h('div', { key: i, style: { marginBottom: '28px', paddingBottom: '20px', borderBottom: '1px solid #E7DAC2' } },
+              coverUrl ? h('img', { src: coverUrl, style: { width: '110px', height: '150px', objectFit: 'cover', borderRadius: '6px', marginBottom: '10px' } }) : null,
+              h('h2', { style: { fontSize: '20px', margin: '0 0 4px' } }, s.title || '(untitled)'),
+              h('p', { style: { margin: '0 0 8px', fontSize: '13px', color: '#5C4B3A' } }, (s.author || '') + ' · ' + (s.age || '')),
+              h('p', { style: { margin: '0 0 10px', fontSize: '15px' } }, s.blurb || ''),
+              (s.pages || []).map(function (p, j) {
+                return h('p', { key: j, style: { fontSize: '15px', lineHeight: '1.7', whiteSpace: 'pre-wrap', marginBottom: '10px' } }, p);
+              })
+            );
+          })
+        );
+      }
+    });
+    CMS.registerPreviewTemplate('stories', StoriesPreview);
+
+    var SitePreview = createClass({
+      render: function () {
+        var entry = this.props.entry;
+        var d = entry.get('data');
+        return h('div', { style: storiesPreviewStyle },
+          h('h1', { style: { fontSize: '26px', marginBottom: '14px' } }, d.get('aboutTitle') || ''),
+          h('p', { style: { marginBottom: '10px' } }, d.get('aboutP1') || ''),
+          h('p', { style: { marginBottom: '20px' } }, d.get('aboutP2') || ''),
+          h('hr', { style: { border: 'none', borderTop: '1px solid #E7DAC2', margin: '20px 0' } }),
+          h('h2', { style: { fontSize: '20px', marginBottom: '6px' } }, d.get('signupTitle') || ''),
+          h('p', { style: { marginBottom: '20px' } }, d.get('signupSubtext') || ''),
+          h('p', { style: { fontSize: '13px', color: '#5C4B3A' } }, 'Contact: ' + (d.get('contactEmail') || ''))
+        );
+      }
+    });
+    CMS.registerPreviewTemplate('site', SitePreview);
+  </script>
+</body>
+</html>
