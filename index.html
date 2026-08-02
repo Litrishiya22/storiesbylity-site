@@ -382,8 +382,19 @@
     <div class="cta-band">
       <h2 id="signupTitle">New stories, once in a while</h2>
       <p id="signupSubtext">No spam — just a note when a new book is ready to read.</p>
-      <form id="signupForm" style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
-        <input type="email" required placeholder="you@example.com" style="padding:12px 14px; border-radius:7px; border:none; width:240px; font-family:'Karla',sans-serif; font-size:14px;">
+      <form
+        id="signupForm"
+        name="newsletter-signup"
+        method="POST"
+        data-netlify="true"
+        netlify-honeypot="signup-bot-field"
+        style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;"
+      >
+        <input type="hidden" name="form-name" value="newsletter-signup" />
+        <p style="display:none;">
+          <label>Don't fill this out if you're human: <input name="signup-bot-field" /></label>
+        </p>
+        <input id="signupEmail" name="email" type="email" required placeholder="you@example.com" style="padding:12px 14px; border-radius:7px; border:none; width:240px; font-family:'Karla',sans-serif; font-size:14px;">
         <button class="btn btn-primary" type="submit">Notify me</button>
       </form>
       <p id="signupNote" class="mono" style="font-size:12px; margin-top:14px; color:#CBC6DA;"></p>
@@ -570,7 +581,23 @@
 
   document.getElementById('signupForm').addEventListener('submit', (e) => {
     e.preventDefault();
-    document.getElementById('signupNote').textContent = "Thanks — this form isn't wired to anything yet. Connect it to Mailchimp, Kit, or a simple form service to start collecting real signups.";
+    const form = e.target;
+    const data = new FormData(form);
+    const encoded = new URLSearchParams(data).toString();
+    const note = document.getElementById('signupNote');
+    note.textContent = "Sending…";
+    fetch('/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: encoded
+    })
+      .then(() => {
+        note.textContent = "Thanks — you're on the list!";
+        form.reset();
+      })
+      .catch(() => {
+        note.textContent = "Something went wrong. Please try again.";
+      });
   });
 
   const feedbackForm = document.getElementById('feedbackForm');
